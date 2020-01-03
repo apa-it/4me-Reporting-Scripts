@@ -6,9 +6,7 @@ Requires the reporting database from [techwork](https://www.techwork.at).
 4me provides many reports and statistics, but it can still be difficult to find inconsistencies among records, for instance if deactivated users are still entered as Change Managers or SLAs contain inactive Service Offerings.
 These SQL scripts help find these inconsistencies.
 Connect to your techwork reporting database, adapt the script for your URL and run the statements to try it out. They will print out URLs of records that you  can paste into a browser and fix the records there.
-![](query.png )
-![](result.png )
-![](browser.png ) 
+![](screenshots.png )
 
 
 ## SLAs.sql
