@@ -1,4 +1,21 @@
--- Returns the URLS of all active SLAs associated with at least one inactive Organization.
+-- Returns all active SLAs where the Customer field is set to an
+-- inactive Organization.
+DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
+SELECT ALL_slas_Normalized.account sla_account,
+CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") url, ALL_slas_Normalized.Name sla_name,
+ALL_organizations_Normalized.Name customer_name, ALL_organizations_Normalized.Disabled customer_disabled
+ 
+FROM dbo.ALL_slas_Normalized
+ 
+JOIN dbo.ALL_organizations_Normalized
+ON ALL_slas_Normalized.Customer = ALL_organizations_Normalized.Name AND ALL_slas_Normalized.Customer_Account = ALL_organizations_Normalized.ACCOUNT
+ 
+WHERE ALL_slas_Normalized.Status = 'active'
+AND ALL_organizations_Normalized.Disabled = 1
+;
+
+
+-- Returns the URLS of all active SLAs whose Coverage contains at least one inactive Organization.
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
 SELECT DISTINCT CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") "URL"
 FROM dbo.ALL_slas_Organizations
