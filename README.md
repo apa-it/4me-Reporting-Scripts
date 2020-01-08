@@ -8,6 +8,11 @@ These SQL scripts help find these inconsistencies.
 Connect to your techwork reporting database, adapt the script for your URL and run the statements to try it out. They will print out URLs of records that you  can paste into a browser and fix the records there.
 ![](screenshots.png )
 
+## Products.sql
+The statements in this file help you find Products with inconsistencies. See the comments inside the file for details.
+
+## Service Instances.sql
+The statements in this file help you find Service Instances with inconsistencies. See the comments inside the file for details.
 
 ## SLAs.sql
 The statements in this file help you find SLAs with inconsistencies. See the comments inside the file for details.
