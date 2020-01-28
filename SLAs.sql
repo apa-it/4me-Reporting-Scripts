@@ -1,5 +1,4 @@
--- Returns all active SLAs where the Customer field is set to an
--- inactive Organization.
+-- All active SLAs where the Customer field is set to an inactive Organization.
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
 SELECT ALL_slas_Normalized.account sla_account,
 CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") url, ALL_slas_Normalized.Name sla_name,
@@ -15,7 +14,7 @@ AND ALL_organizations_Normalized.Disabled = 1
 ;
 
 
--- Returns the URLS of all active SLAs whose Coverage contains at least one inactive Organization.
+-- All active SLAs whose Coverage contains at least one inactive Organization.
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
 SELECT DISTINCT CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") "URL"
 FROM dbo.ALL_slas_Organizations
@@ -32,7 +31,7 @@ FROM dbo.ALL_slas_Organizations
 
 
 
--- Returns the URLs of all SLAs associated with at least one inactive Service Offering
+-- All SLAs associated with at least one inactive Service Offering
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
 SELECT DISTINCT CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") "URL"
 FROM ALL_slas_Normalized
@@ -43,7 +42,7 @@ WHERE all_slas_normalized.Status = 'active' AND so.Status = 'discontinued';
 
 
 
--- Returns all active SLAs associated with at least one inactive SI.
+-- All active SLAs associated with at least one inactive SI.
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
 SELECT DISTINCT CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") "URL"
 FROM ALL_slas_Normalized
@@ -60,7 +59,7 @@ WHERE all_slas_normalized.Status = 'active' AND (si.Status = 'discontinued' OR s
 
 
 
--- Returns all active SLAs associated with at least one inactive person.
+-- All active SLAs associated with at least one inactive person.
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
 SELECT DISTINCT CONCAT(@BaseUrl + '/slas/', ALL_slas_Normalized."ITRP ID") "URL"
   

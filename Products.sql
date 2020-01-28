@@ -1,12 +1,12 @@
 -- Returns the URLs of all active Products associated with deactivated Organizations
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
-select distinct concat(@BaseUrl + '/products/', ALL_products_Normalized."ITRP ID")
+SELECT DISTINCT CONCAT(@BaseUrl + '/products/', ALL_products_Normalized."ITRP ID")
  
-from dbo.ALL_products_Normalized
+FROM dbo.ALL_products_Normalized
  
-join dbo.ALL_organizations_Normalized on
-  ALL_products_Normalized.Supplier =  ALL_organizations_Normalized.Name and
+JOIN dbo.ALL_organizations_Normalized ON
+  ALL_products_Normalized.Supplier =  ALL_organizations_Normalized.Name AND
   ALL_products_Normalized.Supplier_Account = ALL_organizations_Normalized.ACCOUNT
   
-where ALL_organizations_Normalized.Disabled = 1
-and ALL_products_Normalized.Disabled = 0;
+WHERE ALL_organizations_Normalized.Disabled = 1
+AND ALL_products_Normalized.Disabled = 0;
