@@ -37,9 +37,11 @@ SELECT concat(@BaseUrl + '/problems/', "ITRP ID")
 	from ALL_problems_Normalized 
 	where status != 'solved' AND (manager IN (SELECT email from #tmp) OR member IN (SELECT email from #tmp))
 UNION
-SELECT concat(@BaseUrl + '/project_tasks/', Project_Task) 
+SELECT concat(@BaseUrl + '/project_tasks/', Project_Task)
 	from ALL_project_task_assignments_Normalized 
-	where status NOT IN ('completed', 'canceled') AND assignee IN (SELECT email from #tmp)
+	       join all_project_tasks
+	       on ALL_project_task_assignments_Normalized.project_task = all_project_tasks."ITRP ID"
+	where all_project_tasks.status NOT IN ('completed', 'canceled', 'failed') AND assignee IN (SELECT email from #tmp)
 UNION
 SELECT concat(@BaseUrl + '/project_task_templates/', "Project Task Template") 
 	from ALL_project_task_template_assignments 
@@ -88,14 +90,15 @@ UNION
 SELECT concat(@BaseUrl + '/request_template/', "ITRP ID") 
 	from dbo.ALL_request_templates 
 	where ALL_request_templates.Disabled=0 AND ALL_request_templates.Member IN (SELECT email from #tmp)
-UNION
-SELECT concat(@BaseUrl + '/cis/', ALL_cis_Users."ITRP ID") 
-	from dbo.ALL_cis_Users
-	join dbo.ALL_cis_Normalized as cis
-		on ALL_cis_Users."ITRP ID" = cis."ITRP ID"
-		AND ALL_cis_Users.ACCOUNT = cis.ACCOUNT
-		AND cis.Status != 'removed'
-	where ALL_cis_Users."User" IN (SELECT email from #tmp)
+-- CIs associated with deactivated Users are ok in most cases. Reactivate this block if you still want to find them.
+-- UNION
+-- SELECT concat(@BaseUrl + '/cis/', ALL_cis_Users."ITRP ID") 
+-- 	from dbo.ALL_cis_Users
+-- 	join dbo.ALL_cis_Normalized as cis
+-- 		on ALL_cis_Users."ITRP ID" = cis."ITRP ID"
+-- 		AND ALL_cis_Users.ACCOUNT = cis.ACCOUNT
+-- 		AND cis.Status != 'removed'
+-- 	where ALL_cis_Users."User" IN (SELECT email from #tmp)
 UNION
 SELECT concat(@BaseUrl + '/tasks/', "ITRP ID") 
 	from dbo.ALL_tasks_Normalized 
