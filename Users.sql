@@ -4,62 +4,64 @@ DROP table #tmp;
 
 -- Specific Users
 -- Use these two statements to search for arbitrary users
-CREATE table #tmp (email varchar(254) COLLATE Latin1_General_CI_AS);
+CREATE table #tmp (email varchar(254));
 INSERT into #tmp values ('howard.tanner@widget.com');
 
 -- All Disabled Users
 -- Use this statement to find all disabled users
-SELECT "Primary Email" email into #tmp from dbo.ALL_people_Normalized
-	where Disabled=1 AND "Primary Email" LIKE '%@widget.com'
-	AND "Primary Email" NOT IN (SELECT "Primary Email" from dbo.ALL_people_Normalized where disabled=0) -- don't include users who have an enabled account as well.
-	;
+--SELECT "Primary Email" email into #tmp from dbo.ALL_people_Normalized
+--	where Disabled=1 AND "Primary Email" LIKE '%@widget.com'
+--	AND "Primary Email" NOT IN (SELECT "Primary Email" from dbo.ALL_people_Normalized where disabled=0) -- don't include users who have an enabled account as well.
+--	;
 
 -- Main
 -- This statement finds all records that have users from #tmp associated and prints the URLs of those records.
 DECLARE @BaseUrl VARCHAR(100) = 'https://4me-demo.com' -- Use your base URL here
-SELECT concat(@BaseUrl + '/changes/', "ITRP ID") 
-	from ALL_changes_Normalized 
+
+SELECT concat(@BaseUrl + '/workflows/', "ID") 
+	from ALL_workflows_Normalized 
 	where status != 'completed' AND manager IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/flsas/', "ITRP ID") 
+
+SELECT concat(@BaseUrl + '/flsas/', "ID") 
 	from ALL_flsas_Normalized 
 	where status != 'expired' AND Customer_Representative IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/organizations/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/organizations/', "ID") 
 	from ALL_organizations_Normalized 
 	where ALL_organizations_Normalized.Disabled = 0 AND (manager IN (SELECT email from #tmp) OR substitute IN (SELECT email from #tmp))
 union
-SELECT concat(@BaseUrl + '/people/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/people/', "ID") 
 	from ALL_people_Normalized 
 	where disabled=0 AND "Primary Email" IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/problems/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/problems/', "ID") 
 	from ALL_problems_Normalized 
 	where status != 'solved' AND (manager IN (SELECT email from #tmp) OR member IN (SELECT email from #tmp))
 UNION
 SELECT concat(@BaseUrl + '/project_tasks/', Project_Task)
 	from ALL_project_task_assignments_Normalized 
 	       join all_project_tasks
-	       on ALL_project_task_assignments_Normalized.project_task = all_project_tasks."ITRP ID"
+	       on ALL_project_task_assignments_Normalized.project_task = all_project_tasks."ID"
 	where all_project_tasks.status NOT IN ('completed', 'canceled', 'failed') AND assignee IN (SELECT email from #tmp)
 UNION
 SELECT concat(@BaseUrl + '/project_task_templates/', "Project Task Template") 
 	from ALL_project_task_template_assignments 
 	where assignee IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/projects/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/projects/', "ID") 
 	from ALL_projects_Normalized 
 	where status NOT IN ('completed') AND manager IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/releases/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/releases/', "ID") 
 	from ALL_releases_Normalized 
 	where manager IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/requests/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/requests/', "ID") 
 	from ALL_requests_Normalized 
 	where member IN (SELECT email from #tmp) AND Status != 'completed'
 UNION
-SELECT concat(@BaseUrl + '/services/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/services/', "ID") 
 	from dbo.ALL_services_Normalized
 	where all_services_Normalized.Disabled = 0 AND
 		(  service_owner IN (SELECT email from #tmp)
@@ -71,23 +73,25 @@ SELECT concat(@BaseUrl + '/services/', "ITRP ID")
 		OR continuity_manager IN (SELECT email from #tmp)
 		)
 UNION
-SELECT concat(@BaseUrl + '/slas/',"ITRP ID") 
+SELECT concat(@BaseUrl + '/slas/',"ID") 
 	from ALL_slas_Normalized 
 	where status != 'expired' AND (Service_Level_Manager IN (SELECT email from #tmp) OR Customer_Representative IN (SELECT email from #tmp))
 UNION
-SELECT concat(@BaseUrl + '/task_templates/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/task_templates/', "ID") 
 	from ALL_task_templates_Normalized 
 	where disabled=0 AND member IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/change_templates/', "ITRP ID") 
-	from ALL_change_templates_Normalized 
-	where disabled=0 AND "Recurrence_-_Change_Manager" IN (SELECT email from #tmp)
+
+SELECT concat(@BaseUrl + '/workflow_templates/', "ID") 
+	from ALL_workflow_templates_Normalized 
+	where disabled=0 AND "Recurrence_-_Workflow_Manager" IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/teams/', "ITRP ID") 
+
+SELECT concat(@BaseUrl + '/teams/', "ID") 
 	from ALL_teams_Normalized 
 	where all_teams_normalized.Disabled=0 AND manager IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/request_template/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/request_template/', "ID") 
 	from dbo.ALL_request_templates 
 	where ALL_request_templates.Disabled=0 AND ALL_request_templates.Member IN (SELECT email from #tmp)
 -- CIs associated with deactivated Users are ok in most cases. Reactivate this block if you still want to find them.
@@ -100,7 +104,7 @@ SELECT concat(@BaseUrl + '/request_template/', "ITRP ID")
 -- 		AND cis.Status != 'removed'
 -- 	where ALL_cis_Users."User" IN (SELECT email from #tmp)
 UNION
-SELECT concat(@BaseUrl + '/tasks/', "ITRP ID") 
+SELECT concat(@BaseUrl + '/tasks/', "ID") 
 	from dbo.ALL_tasks_Normalized 
 	where (Status != 'failed' AND Status != 'rejected' AND Status != 'completed' AND Status != 'canceled' AND Status != 'approved') 
 		AND member IN (SELECT email from #tmp)
